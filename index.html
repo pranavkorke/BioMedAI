@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BioMedAI – AI-Powered Diagnostic Tools for Medical Imaging</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f4;--panel:#fff;--ink:#14232e;--mute:#566772;--line:#cfd9de;--accent:#0f7f82;--warn:#c4410c;--film:#0b141b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a21;--panel:#16252e;--ink:#e6eef2;--mute:#97aab5;--line:#2b3f4b;--accent:#4cc3c6;--warn:#ff8a5b}}
+:root[data-theme="dark"]{--bg:#0f1a21;--panel:#16252e;--ink:#e6eef2;--mute:#97aab5;--line:#2b3f4b;--accent:#4cc3c6;--warn:#ff8a5b}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 "Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.08;margin:0}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+nav b{font:800 1.3rem "Bricolage Grotesque",sans-serif}nav b span{color:var(--accent)}
+nav div a{margin-left:20px;color:var(--ink);text-decoration:none;font-weight:500}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:36px 0 64px}
+h1{font-size:clamp(2.3rem,5.5vw,4rem);font-weight:800;letter-spacing:-.02em}
+.hero p{color:var(--mute);max-width:46ch;margin:18px 0 0}
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.film{background:var(--film);border-radius:8px;aspect-ratio:1/1;display:block;width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button,.btn{font:600 .95rem "Public Sans",sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:10px 16px;border-radius:8px;cursor:pointer}
+button.main{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible,input:focus-visible+.btn{outline:3px solid var(--accent);outline-offset:2px}
+#file{position:absolute;opacity:0;pointer-events:none}
+#out{margin-top:12px;min-height:3.2em}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--warn);width:0;transition:width .5s}
+small{color:var(--mute)}
+section{padding:56px 0;border-top:1px solid var(--line)}
+section h2{font-size:clamp(1.6rem,3.5vw,2.3rem);margin-bottom:22px}
+ol{list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:0;margin:0}
+ol li{counter-increment:s;border-left:3px solid var(--accent);padding-left:14px}
+ol li::before{content:counter(s);font:800 1.6rem "Bricolage Grotesque";color:var(--accent)}
+ol b{display:block}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.grid p{color:var(--mute);margin:6px 0 0}
+.note{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--warn);padding:16px 18px;border-radius:8px}
+footer{padding:30px 0;color:var(--mute);border-top:1px solid var(--line)}
+@media(max-width:800px){.hero,.grid,ol{grid-template-columns:1fr}nav div a:not(:last-child){display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><b>BioMed<span>AI</span></b><div><a href="#how">How it works</a><a href="#scope">What it reads</a><a href="#safety">Safety</a></div></nav>
+<header class="hero">
+<div>
+<h1>A second reader for every scan.</h1>
+<p>BioMedAI uses a convolutional neural network to flag suspicious regions in X-rays and MRIs, so radiologists can review urgent cases first and catch what a tired eye might miss.</p>
+</div>
+<div class="demo" id="demo">
+<canvas class="film" id="cv" width="480" height="480" role="img" aria-label="Scan preview with highlighted region"></canvas>
+<div class="row">
+<label><input type="file" id="file" accept="image/*"><span class="btn" id="pick">Upload scan</span></label>
+<button id="sample">Use sample image</button>
+<button class="main" id="go">Analyze scan</button>
+</div>
+<div id="out" aria-live="polite"><small>Upload a scan or use the sample, then select Analyze scan.</small></div>
+</div>
+</header>
+</div>
+
+<div class="wrap">
+<section id="how"><h2>From scan to second opinion</h2>
+<ol>
+<li><b>Upload</b>DICOM or image file from the radiologist.</li>
+<li><b>Preprocess</b>Resize, normalize contrast, remove noise.</li>
+<li><b>Analyze</b>The CNN scores the scan and marks the region that drove the score.</li>
+<li><b>Review</b>The radiologist confirms or overrules the result.</li>
+</ol></section>
+
+<section id="scope"><h2>What BioMedAI reads</h2>
+<div class="grid">
+<div><h3>Chest X-rays</h3><p>Lung nodules, pneumonia and other opacities.</p></div>
+<div><h3>Brain MRI</h3><p>Tumors and signs of neurological disorders.</p></div>
+<div><h3>Your own datasets</h3><p>Retrain the CNN on labeled images from your hospital or study.</p></div>
+</div></section>
+
+<section id="safety"><h2>Built to assist, not replace</h2>
+<div class="note">BioMedAI is a decision-support tool for trained clinicians. Its output is a flag for review, never a diagnosis. The analyzer on this page runs in demo mode and returns simulated results until it is connected to a trained model.</div></section>
+</div>
+<footer><div class="wrap">BioMedAI – AI-Powered Diagnostic Tools for Medical Imaging</div></footer>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),out=document.getElementById('out');
+let img=null,fileBlob=null;
+function drawBase(){ctx.fillStyle='#0b141b';ctx.fillRect(0,0,480,480);
+if(img){const s=Math.min(480/img.width,480/img.height);ctx.drawImage(img,(480-img.width*s)/2,(480-img.height*s)/2,img.width*s,img.height*s)}}
+function sample(){const c=document.createElement('canvas');c.width=c.height=480;const g=c.getContext('2d');
+g.fillStyle='#0b141b';g.fillRect(0,0,480,480);
+[[160,250],[320,250]].forEach(([x,y])=>{const r=g.createRadialGradient(x,y,10,x,y,130);r.addColorStop(0,'rgba(200,215,225,.55)');r.addColorStop(1,'rgba(200,215,225,.05)');g.fillStyle=r;g.beginPath();g.ellipse(x,y,85,150,0,0,7);g.fill()});
+g.fillStyle='rgba(220,230,238,.5)';g.fillRect(228,60,24,360);
+const i=new Image();i.onload=()=>{img=i;fileBlob=null;drawBase();out.innerHTML='<small>Sample loaded.</small>'};i.src=c.toDataURL()}
+document.getElementById('sample').onclick=sample;
+document.getElementById('file').onchange=e=>{const f=e.target.files[0];if(!f)return;fileBlob=f;
+const i=new Image();i.onload=()=>{img=i;drawBase();out.innerHTML='<small>'+f.name.replace(/[<>&]/g,'')+' loaded.</small>'};i.src=URL.createObjectURL(f)};
+function show(score,x,y,demo){drawBase();
+const r=ctx.createRadialGradient(x,y,4,x,y,70);r.addColorStop(0,'rgba(255,90,40,.75)');r.addColorStop(1,'rgba(255,90,40,0)');ctx.fillStyle=r;ctx.fillRect(0,0,480,480);
+ctx.strokeStyle='#ffb347';ctx.lineWidth=2;ctx.strokeRect(x-45,y-45,90,90);
+const p=Math.round(score*100),flag=score>.5;
+out.innerHTML='<b>'+(flag?'Region flagged for review':'No region flagged')+'</b> – abnormality score '+p+'%<div class="bar"><i style="width:'+p+'%"></i></div>'+(demo?'<small>Demo mode: simulated result, not a diagnosis.</small>':'<small>Decision support only. A radiologist must confirm.</small>')}
+document.getElementById('go').onclick=async()=>{
+if(!img){out.innerHTML='<small>Add a scan first: upload one or use the sample image.</small>';return}
+out.innerHTML='<small>Analyzing…</small>';
+try{if(!fileBlob)throw 0;const fd=new FormData();fd.append('image',fileBlob);
+const r=await fetch('/predict',{method:'POST',body:fd});if(!r.ok)throw 0;const d=await r.json();show(d.score,d.x*480,d.y*480,false)}
+catch(e){const t=ctx.getImageData(0,0,480,480).data;let h=0;for(let i=0;i<t.length;i+=997)h=(h*31+t[i])>>>0;
+setTimeout(()=>show(.45+(h%50)/100,140+(h%200),150+((h>>8)%180),true),600)}};
+sample();
+</script>
+</body>
+</html>
